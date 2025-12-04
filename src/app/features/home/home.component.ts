@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { ArticleService } from '../articles/services/article.service';
@@ -13,14 +13,14 @@ import { ArticleListItem } from '../../core/models';
   template: `
     <div class="container mx-auto px-4 py-8">
       <h1 class="text-4xl font-bold mb-8">Son Haberler</h1>
-      
+
       <!-- Breaking News -->
       @if (breakingNews.length > 0) {
         <section class="mb-12">
           <h2 class="text-2xl font-bold mb-4 text-red-600">Son Dakika</h2>
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             @for (article of breakingNews; track article.id) {
-              <mat-card class="cursor-pointer hover:shadow-lg transition-shadow">
+              <mat-card class="cursor-pointer hover:shadow-lg transition-shadow" (click)="goToArticle(article.slug)">
                 @if (article.featured_image) {
                   <img mat-card-image [src]="article.featured_image.file" [alt]="article.title">
                 }
@@ -32,7 +32,7 @@ import { ArticleListItem } from '../../core/models';
                   <p>{{ article.summary }}</p>
                 </mat-card-content>
                 <mat-card-actions>
-                  <button mat-button color="primary" [routerLink]="['/article', article.slug]">
+                  <button mat-button color="primary" (click)="$event.stopPropagation()">
                     Devamını Oku
                   </button>
                 </mat-card-actions>
@@ -48,7 +48,7 @@ import { ArticleListItem } from '../../core/models';
           <h2 class="text-2xl font-bold mb-4">Öne Çıkan Haberler</h2>
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             @for (article of featuredArticles; track article.id) {
-              <mat-card class="cursor-pointer hover:shadow-lg transition-shadow">
+              <mat-card class="cursor-pointer hover:shadow-lg transition-shadow" (click)="goToArticle(article.slug)">
                 @if (article.featured_image) {
                   <img mat-card-image [src]="article.featured_image.file" [alt]="article.title">
                 }
@@ -56,7 +56,7 @@ import { ArticleListItem } from '../../core/models';
                   <mat-card-title class="text-base">{{ article.title }}</mat-card-title>
                 </mat-card-header>
                 <mat-card-actions>
-                  <button mat-button color="primary" [routerLink]="['/article', article.slug]">
+                  <button mat-button color="primary" (click)="$event.stopPropagation()">
                     Oku
                   </button>
                 </mat-card-actions>
@@ -71,7 +71,7 @@ import { ArticleListItem } from '../../core/models';
         <h2 class="text-2xl font-bold mb-4">Tüm Haberler</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           @for (article of articles; track article.id) {
-            <mat-card class="cursor-pointer hover:shadow-lg transition-shadow">
+            <mat-card class="cursor-pointer hover:shadow-lg transition-shadow" (click)="goToArticle(article.slug)">
               @if (article.featured_image) {
                 <img mat-card-image [src]="article.featured_image.file" [alt]="article.title">
               }
@@ -88,7 +88,7 @@ import { ArticleListItem } from '../../core/models';
                 </div>
               </mat-card-content>
               <mat-card-actions>
-                <button mat-button color="primary" [routerLink]="['/article', article.slug]">
+                <button mat-button color="primary" (click)="$event.stopPropagation()">
                   Devamını Oku
                 </button>
               </mat-card-actions>
@@ -112,6 +112,7 @@ import { ArticleListItem } from '../../core/models';
 })
 export class HomeComponent implements OnInit {
   private articleService = inject(ArticleService);
+  private router = inject(Router);
 
   articles: ArticleListItem[] = [];
   featuredArticles: ArticleListItem[] = [];
@@ -122,6 +123,10 @@ export class HomeComponent implements OnInit {
     this.loadArticles();
     this.loadFeaturedArticles();
     this.loadBreakingNews();
+  }
+
+  goToArticle(slug: string): void {
+    this.router.navigate(['/article', slug]);
   }
 
   loadArticles(): void {

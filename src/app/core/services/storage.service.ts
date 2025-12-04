@@ -1,13 +1,22 @@
-import { Injectable } from '@angular/core';
+import { Injectable, PLATFORM_ID, inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { APP_CONFIG } from '../constants/app-config';
 
 @Injectable({
   providedIn: 'root'
 })
 export class StorageService {
-  
+  private platformId = inject(PLATFORM_ID);
+  private isBrowser: boolean;
+
+  constructor() {
+    this.isBrowser = isPlatformBrowser(this.platformId);
+  }
+
   // Set item to localStorage
   setItem(key: string, value: any): void {
+    if (!this.isBrowser) return;
+
     try {
       const serializedValue = JSON.stringify(value);
       localStorage.setItem(key, serializedValue);
@@ -18,6 +27,8 @@ export class StorageService {
 
   // Get item from localStorage
   getItem<T>(key: string): T | null {
+    if (!this.isBrowser) return null;
+
     try {
       const item = localStorage.getItem(key);
       return item ? JSON.parse(item) : null;
@@ -29,6 +40,8 @@ export class StorageService {
 
   // Remove item from localStorage
   removeItem(key: string): void {
+    if (!this.isBrowser) return;
+
     try {
       localStorage.removeItem(key);
     } catch (error) {
@@ -38,6 +51,8 @@ export class StorageService {
 
   // Clear all localStorage
   clear(): void {
+    if (!this.isBrowser) return;
+
     try {
       localStorage.clear();
     } catch (error) {

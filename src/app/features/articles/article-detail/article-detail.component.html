@@ -1,0 +1,350 @@
+<div class="article-detail-container">
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="loading-container flex justify-center items-center min-h-screen">
+      <mat-spinner></mat-spinner>
+    </div>
+  }
+
+  <!-- Error State -->
+  @if (error() && !isLoading()) {
+    <div class="error-container max-w-4xl mx-auto px-4 py-12 text-center">
+      <mat-icon class="text-6xl text-red-500 mb-4">error_outline</mat-icon>
+      <h2 class="text-2xl font-bold mb-4">{{ error() }}</h2>
+      <p class="text-gray-600 mb-6">Ana sayfaya yönlendiriliyorsunuz...</p>
+      <button mat-raised-button color="primary" routerLink="/">
+        Ana Sayfaya Dön
+      </button>
+    </div>
+  }
+
+  <!-- Article Content -->
+  @if (article() && !isLoading()) {
+    <article class="max-w-4xl mx-auto px-4 py-8">
+
+      <!-- Breadcrumb -->
+      <nav class="breadcrumb mb-6 text-sm text-gray-600">
+        <a routerLink="/" class="hover:text-blue-600">Ana Sayfa</a>
+        <span class="mx-2">/</span>
+        <a [routerLink]="['/category', article()!.category.slug]" class="hover:text-blue-600">
+          {{ article()!.category.name }}
+        </a>
+        <span class="mx-2">/</span>
+        <span class="text-gray-900">{{ article()!.title }}</span>
+      </nav>
+
+      <!-- Article Header -->
+      <header class="article-header mb-8">
+        <!-- Breaking/Featured Badges -->
+        <div class="badges mb-4 flex gap-2">
+          @if (article()!.is_breaking) {
+            <mat-chip class="bg-red-600 text-white">
+              <mat-icon class="mr-1">notifications_active</mat-icon>
+              Son Dakika
+            </mat-chip>
+          }
+          @if (article()!.is_featured) {
+            <mat-chip class="bg-blue-600 text-white">
+              <mat-icon class="mr-1">star</mat-icon>
+              Öne Çıkan
+            </mat-chip>
+          }
+          @if (article()!.is_trending) {
+            <mat-chip class="bg-orange-600 text-white">
+              <mat-icon class="mr-1">trending_up</mat-icon>
+              Trend
+            </mat-chip>
+          }
+        </div>
+
+        <!-- Category -->
+        <div class="category mb-3">
+          <a
+            [routerLink]="['/category', article()!.category.slug]"
+            class="text-blue-600 hover:text-blue-800 font-semibold uppercase text-sm tracking-wide"
+          >
+            {{ article()!.category.name }}
+          </a>
+        </div>
+
+        <!-- Title -->
+        <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4 leading-tight">
+          {{ article()!.title }}
+        </h1>
+
+        <!-- Subtitle -->
+        @if (article()!.subtitle) {
+          <h2 class="text-xl md:text-2xl text-gray-600 mb-6 leading-relaxed">
+            {{ article()!.subtitle }}
+          </h2>
+        }
+
+        <!-- Meta Info -->
+        <div class="meta-info flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-6">
+          <!-- Author -->
+          <div class="author flex items-center gap-2">
+            <div class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center">
+              <mat-icon>person</mat-icon>
+            </div>
+            <div>
+              <div class="text-xs text-gray-500">Yazar</div>
+              <a
+                [routerLink]="['/author', article()!.author.slug]"
+                class="font-semibold text-gray-900 hover:text-blue-600"
+              >
+                {{ article()!.author.display_name }}
+              </a>
+            </div>
+          </div>
+
+          <mat-divider [vertical]="true" class="h-10"></mat-divider>
+
+          <!-- Publish Date -->
+          <div class="date">
+            <mat-icon class="text-sm align-middle mr-1">schedule</mat-icon>
+            {{ publishDate }}
+          </div>
+
+          <mat-divider [vertical]="true" class="h-10"></mat-divider>
+
+          <!-- Reading Time -->
+          <div class="reading-time">
+            <mat-icon class="text-sm align-middle mr-1">timer</mat-icon>
+            {{ readingTime }}
+          </div>
+
+          <mat-divider [vertical]="true" class="h-10"></mat-divider>
+
+          <!-- Views -->
+          <div class="views">
+            <mat-icon class="text-sm align-middle mr-1">visibility</mat-icon>
+            {{ article()!.views_count }} görüntülenme
+          </div>
+        </div>
+
+        <!-- Share Buttons -->
+        <div class="share-buttons flex flex-wrap gap-2 mb-6">
+          <button mat-mini-fab color="primary" (click)="shareOnFacebook()" matTooltip="Facebook'ta Paylaş">
+            <mat-icon>facebook</mat-icon>
+          </button>
+          <button mat-mini-fab class="bg-sky-500 text-white" (click)="shareOnTwitter()" matTooltip="Twitter'da Paylaş">
+            <mat-icon>share</mat-icon>
+          </button>
+          <button mat-mini-fab class="bg-blue-700 text-white" (click)="shareOnLinkedIn()" matTooltip="LinkedIn'de Paylaş">
+            <mat-icon>business</mat-icon>
+          </button>
+          <button mat-mini-fab class="bg-green-600 text-white" (click)="shareOnWhatsApp()" matTooltip="WhatsApp'ta Paylaş">
+            <mat-icon>chat</mat-icon>
+          </button>
+          <button mat-mini-fab (click)="copyLink()" matTooltip="Linki Kopyala">
+            <mat-icon>link</mat-icon>
+          </button>
+          <button mat-mini-fab (click)="printArticle()" matTooltip="Yazdır">
+            <mat-icon>print</mat-icon>
+          </button>
+        </div>
+      </header>
+
+      <mat-divider class="mb-8"></mat-divider>
+
+      <!-- Featured Image -->
+      @if (article()!.featured_image) {
+        <figure class="featured-image mb-8">
+          <img
+            [src]="article()!.featured_image!.file"
+            [alt]="article()!.featured_image!.alt_text || article()!.title"
+            class="w-full h-auto rounded-lg shadow-lg"
+          >
+          @if (article()!.featured_image?.caption) {
+            <figcaption class="text-sm text-gray-600 mt-2 text-center italic">
+              {{ article()!.featured_image?.caption }}
+            </figcaption>
+          }
+        </figure>
+      }
+
+      <!-- Summary -->
+      @if (article()!.summary) {
+        <div class="summary text-xl text-gray-700 leading-relaxed mb-8 p-6 bg-gray-50 rounded-lg border-l-4 border-blue-600">
+          {{ article()!.summary }}
+        </div>
+      }
+
+      <!-- Video (if has_video) -->
+      @if (article()!.has_video) {
+        <div class="video-container mb-8">
+          @if (article()!.video_embed_code) {
+            <!-- Embedded video -->
+            <div class="video-embed" [innerHTML]="article()!.video_embed_code"></div>
+          } @else if (article()!.video_url) {
+            <!-- Video URL -->
+            <video controls class="w-full rounded-lg shadow-lg">
+              <source [src]="article()!.video_url" type="video/mp4">
+              Tarayıcınız video etiketini desteklemiyor.
+            </video>
+          } @else if (article()!.video_file) {
+            <!-- Uploaded video file -->
+            <video controls class="w-full rounded-lg shadow-lg">
+              <source [src]="article()!.video_file" type="video/mp4">
+              Tarayıcınız video etiketini desteklemiyor.
+            </video>
+          }
+        </div>
+      }
+
+      <!-- Article Content -->
+      <div class="article-content prose prose-lg max-w-none mb-8">
+        <div [innerHTML]="articleContent"></div>
+      </div>
+
+      <!-- Gallery -->
+      @if (article()!.gallery && article()!.gallery.length > 0) {
+        <div class="gallery mb-8">
+          <h3 class="text-2xl font-bold mb-4">Fotoğraf Galerisi</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            @for (image of article()!.gallery; track image.id) {
+              <figure class="gallery-item">
+                <img
+                  [src]="image.file"
+                  [alt]="image.alt_text || ''"
+                  class="w-full h-64 object-cover rounded-lg shadow cursor-pointer hover:opacity-90 transition-opacity"
+                >
+                @if (image.caption) {
+                  <figcaption class="text-sm text-gray-600 mt-2">
+                    {{ image.caption }}
+                  </figcaption>
+                }
+              </figure>
+            }
+          </div>
+        </div>
+      }
+
+      <mat-divider class="my-8"></mat-divider>
+
+      <!-- Tags -->
+      @if (article()!.tags && article()!.tags.length > 0) {
+        <div class="tags mb-8">
+          <h4 class="text-lg font-semibold mb-3">Etiketler</h4>
+          <div class="flex flex-wrap gap-2">
+            @for (tag of article()!.tags; track tag.id) {
+              <mat-chip
+                [routerLink]="['/tag', tag.slug]"
+                class="cursor-pointer hover:bg-blue-100"
+              >
+                <mat-icon class="mr-1">label</mat-icon>
+                {{ tag.name }}
+              </mat-chip>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Co-Authors -->
+      @if (article()!.co_authors && article()!.co_authors.length > 0) {
+        <div class="co-authors mb-8">
+          <h4 class="text-lg font-semibold mb-3">Katkıda Bulunanlar</h4>
+          <div class="flex flex-wrap gap-4">
+            @for (author of article()!.co_authors; track author.id) {
+              <a
+                [routerLink]="['/author', author.slug]"
+                class="flex items-center gap-2 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                <div class="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center">
+                  <mat-icon>person</mat-icon>
+                </div>
+                <div>
+                  <div class="font-semibold">{{ author.display_name }}</div>
+                  @if (author.title) {
+                    <div class="text-sm text-gray-600">{{ author.title }}</div>
+                  }
+                </div>
+              </a>
+            }
+          </div>
+        </div>
+      }
+
+      <mat-divider class="my-8"></mat-divider>
+
+      <!-- Author Bio -->
+      <div class="author-bio mb-8 p-6 bg-gray-50 rounded-lg">
+        <h4 class="text-lg font-semibold mb-4">Yazar Hakkında</h4>
+        <div class="flex gap-4">
+          <div class="w-20 h-20 rounded-full bg-gray-300 flex items-center justify-center">
+            <mat-icon class="text-4xl">person</mat-icon>
+          </div>
+          <div class="flex-1">
+            <h5 class="font-bold text-xl mb-1">{{ article()!.author.display_name }}</h5>
+            @if (article()!.author.title) {
+              <p class="text-sm text-gray-600 mb-2">{{ article()!.author.title }}</p>
+            }
+            @if (article()!.author.bio_long) {
+              <p class="text-gray-700 mb-3">{{ article()!.author.bio_long }}</p>
+            }
+
+            <!-- Social Links -->
+            @if (article()!.author.social_twitter || article()!.author.social_linkedin || article()!.author.social_instagram) {
+              <div class="social-links flex gap-2">
+                @if (article()!.author.social_twitter) {
+                  <a [href]="article()!.author.social_twitter" target="_blank" mat-icon-button>
+                    <mat-icon>share</mat-icon>
+                  </a>
+                }
+                @if (article()!.author.social_linkedin) {
+                  <a [href]="article()!.author.social_linkedin" target="_blank" mat-icon-button>
+                    <mat-icon>business</mat-icon>
+                  </a>
+                }
+                @if (article()!.author.social_instagram) {
+                  <a [href]="article()!.author.social_instagram" target="_blank" mat-icon-button>
+                    <mat-icon>photo_camera</mat-icon>
+                  </a>
+                }
+              </div>
+            }
+
+            <div class="stats mt-3 flex gap-4 text-sm text-gray-600">
+              <span>{{ article()!.author.total_articles }} makale</span>
+              <span>{{ article()!.author.total_views }} görüntülenme</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Related Articles -->
+      @if (relatedArticles() && relatedArticles().length > 0) {
+        <div class="related-articles mb-8">
+          <h3 class="text-2xl font-bold mb-6">İlgili Haberler</h3>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            @for (related of relatedArticles(); track related.id) {
+              <mat-card class="cursor-pointer hover:shadow-lg transition-shadow">
+                @if (related.featured_image) {
+                  <img mat-card-image [src]="related.featured_image.file" [alt]="related.title">
+                }
+                <mat-card-header>
+                  <mat-card-title class="text-base">{{ related.title }}</mat-card-title>
+                </mat-card-header>
+                <mat-card-actions>
+                  <button mat-button color="primary" [routerLink]="['/article', related.slug]">
+                    Oku
+                  </button>
+                </mat-card-actions>
+              </mat-card>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Comments Section (Placeholder) -->
+      <div class="comments-section mt-12">
+        <h3 class="text-2xl font-bold mb-6">Yorumlar</h3>
+        <div class="bg-gray-50 p-8 rounded-lg text-center text-gray-600">
+          <mat-icon class="text-4xl mb-2">comment</mat-icon>
+          <p>Yorum sistemi yakında eklenecek...</p>
+        </div>
+      </div>
+
+    </article>
+  }
+</div>
