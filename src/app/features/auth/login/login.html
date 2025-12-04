@@ -1,0 +1,55 @@
+<div class="login-container min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+  <mat-card class="max-w-md w-full">
+    <mat-card-header class="text-center mb-6">
+      <mat-card-title class="text-3xl font-bold">Giriş Yap</mat-card-title>
+      <mat-card-subtitle>Hesabınıza giriş yapın</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-4">
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Kullanıcı Adı veya Email</mat-label>
+          <input matInput formControlName="username" type="text" required>
+          <mat-icon matPrefix>person</mat-icon>
+          @if (loginForm.get('username')?.hasError('required') && loginForm.get('username')?.touched) {
+            <mat-error>Kullanıcı adı gereklidir</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Şifre</mat-label>
+          <input matInput formControlName="password" [type]="hidePassword ? 'password' : 'text'" required>
+          <mat-icon matPrefix>lock</mat-icon>
+          <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword">
+            <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+          </button>
+          @if (loginForm.get('password')?.hasError('required') && loginForm.get('password')?.touched) {
+            <mat-error>Şifre gereklidir</mat-error>
+          }
+        </mat-form-field>
+
+        <div class="flex items-center justify-between">
+          <mat-checkbox formControlName="rememberMe">Beni Hatırla</mat-checkbox>
+          <a routerLink="/auth/forgot-password" class="text-sm text-primary-600 hover:text-primary-800">
+            Şifremi Unuttum?
+          </a>
+        </div>
+
+        <button mat-raised-button color="primary" type="submit" class="w-full" [disabled]="isLoading || loginForm.invalid">
+          @if (isLoading) {
+            <span>Giriş yapılıyor...</span>
+          } @else {
+            <span>Giriş Yap</span>
+          }
+        </button>
+
+        <div class="text-center mt-4">
+          <span class="text-sm text-gray-600">Hesabınız yok mu?</span>
+          <a routerLink="/auth/register" class="text-sm text-primary-600 hover:text-primary-800 ml-1">
+            Kayıt Ol
+          </a>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>
