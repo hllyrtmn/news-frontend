@@ -1,11 +1,9 @@
 export interface Comment {
   id: number;
   article: number;
-  user: {
-    id: number;
-    username: string;
-    avatar?: string;
-  };
+  user: number; // User ID
+  user_name: string; // User display name
+  user_avatar?: string; // User avatar URL
   parent?: number;
   content: string;
   status: 'pending' | 'approved' | 'rejected' | 'spam';

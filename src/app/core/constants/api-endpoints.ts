@@ -15,13 +15,12 @@ export const API_ENDPOINTS = {
   ARTICLES: {
     BASE: '/articles/',
     DETAIL: (slug: string) => `/articles/${slug}/`,
-    BY_CATEGORY: (categorySlug: string) => `/articles/?category=${categorySlug}`,
-    BY_TAG: (tagSlug: string) => `/articles/?tags=${tagSlug}`,
-    BY_AUTHOR: (authorSlug: string) => `/articles/?author=${authorSlug}`,
-    SEARCH: (query: string) => `/articles/?search=${query}`,
-    FEATURED: '/articles/?is_featured=true',
-    BREAKING: '/articles/?is_breaking=true',
-    TRENDING: '/articles/?is_trending=true',
+    SEARCH: '/articles/search/', // GET /articles/search/?q=query
+    FEATURED: '/articles/featured/',
+    BREAKING: '/articles/breaking/',
+    TRENDING: '/articles/trending/',
+    POPULAR: '/articles/popular/', // GET /articles/popular/?period=weekly
+    VIEW: (slug: string) => `/articles/${slug}/view/`, // POST
   },
 
   // Categories
@@ -40,11 +39,13 @@ export const API_ENDPOINTS = {
   // Comments
   COMMENTS: {
     BASE: '/comments/',
+    LIST: '/comments/', // GET /comments/?article={id}
+    CREATE: '/comments/',
     DETAIL: (id: number) => `/comments/${id}/`,
-    BY_ARTICLE: (articleId: number) => `/comments/?article=${articleId}`,
-    APPROVE: (id: number) => `/comments/${id}/approve/`,
-    REJECT: (id: number) => `/comments/${id}/reject/`,
-    SPAM: (id: number) => `/comments/${id}/spam/`,
+    UPDATE: (id: number) => `/comments/${id}/`,
+    DELETE: (id: number) => `/comments/${id}/`,
+    LIKE: (id: number) => `/comments/${id}/like/`,
+    // Note: Backend'de dislike, report yok - frontend'de disable edilecek
   },
 
   // Interactions

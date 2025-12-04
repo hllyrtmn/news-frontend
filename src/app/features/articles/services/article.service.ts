@@ -54,32 +54,32 @@ export class ArticleService {
   // Get articles by category
   getArticlesByCategory(categorySlug: string, page?: number): Observable<PaginatedResponse<ArticleListItem>> {
     return this.apiService.get<PaginatedResponse<ArticleListItem>>(
-      API_ENDPOINTS.ARTICLES.BY_CATEGORY(categorySlug),
-      { page }
+      API_ENDPOINTS.ARTICLES.BASE,
+      { category: categorySlug, page }
     );
   }
 
   // Get articles by tag
   getArticlesByTag(tagSlug: string, page?: number): Observable<PaginatedResponse<ArticleListItem>> {
     return this.apiService.get<PaginatedResponse<ArticleListItem>>(
-      API_ENDPOINTS.ARTICLES.BY_TAG(tagSlug),
-      { page }
+      API_ENDPOINTS.ARTICLES.BASE,
+      { tags: tagSlug, page }
     );
   }
 
   // Get articles by author
   getArticlesByAuthor(authorSlug: string, page?: number): Observable<PaginatedResponse<ArticleListItem>> {
     return this.apiService.get<PaginatedResponse<ArticleListItem>>(
-      API_ENDPOINTS.ARTICLES.BY_AUTHOR(authorSlug),
-      { page }
+      API_ENDPOINTS.ARTICLES.BASE,
+      { author: authorSlug, page }
     );
   }
 
   // Search articles
   searchArticles(query: string, page?: number): Observable<PaginatedResponse<ArticleListItem>> {
     return this.apiService.get<PaginatedResponse<ArticleListItem>>(
-      API_ENDPOINTS.ARTICLES.SEARCH(query),
-      { page }
+      API_ENDPOINTS.ARTICLES.SEARCH,
+      { q: query, page }
     );
   }
 
@@ -105,13 +105,20 @@ export class ArticleService {
     return this.apiService.post<void>(`${API_ENDPOINTS.ARTICLES.DETAIL(slug)}increment_views/`, {});
   }
 
+  // Get related articles (same category)
+  getRelatedArticles(categorySlug: string, excludeSlug: string): Observable<PaginatedResponse<ArticleListItem>> {
+    return this.apiService.get<PaginatedResponse<ArticleListItem>>(
+      `${API_ENDPOINTS.ARTICLES.BASE}?category=${categorySlug}&exclude=${excludeSlug}&page_size=3`
+    );
+  }
+
   // Prepare FormData for article creation/update
   private prepareFormData(data: any): FormData {
     const formData = new FormData();
 
     Object.keys(data).forEach(key => {
       const value = data[key];
-      
+
       if (value === null || value === undefined) {
         return;
       }
