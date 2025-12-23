@@ -27,7 +27,7 @@ export class AuthService {
   isAuthenticated = computed(() => this.isAuthenticatedSignal());
   isAdmin = computed(() => {
     const user = this.currentUserSignal();
-    return user?.user_type === 'admin' || user?.is_superuser || false;
+    return user?.is_staff || user?.is_superuser || user?.user_type === 'admin' || false;
   });
   isEditor = computed(() => {
     const user = this.currentUserSignal();
@@ -50,10 +50,24 @@ export class AuthService {
   private initializeAuth(): void {
     const token = this.storageService.getAccessToken();
     const user = this.storageService.getCurrentUser();
-    
+
+    // ✅ DEBUG LOGLARI EKLE
+    console.log('🔐 Auth Initialize:', {
+      hasToken: !!token,
+      hasUser: !!user,
+      user: user
+    });
+
     if (token && user) {
       this.currentUserSignal.set(user);
       this.isAuthenticatedSignal.set(true);
+
+      console.log('✅ Auth başarılı:', {
+        username: user.username,
+        isAuthenticated: true
+      });
+    } else {
+      console.log('❌ Auth başarısız - Token veya user yok');
     }
   }
 
@@ -92,7 +106,7 @@ export class AuthService {
   // Refresh token
   refreshToken(): Observable<TokenRefreshResponse> {
     const refreshToken = this.storageService.getRefreshToken();
-    
+
     if (!refreshToken) {
       return throwError(() => new Error('No refresh token available'));
     }

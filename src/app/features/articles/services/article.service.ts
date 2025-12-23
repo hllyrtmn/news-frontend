@@ -25,6 +25,12 @@ export class ArticleService {
     );
   }
 
+  getArticle(id: number | string): Observable<ArticleDetail> {
+    return this.apiService.get<ArticleDetail>(
+      API_ENDPOINTS.ARTICLES.DETAIL(id)
+    );
+  }
+
   // Get single article by slug
   getArticleBySlug(slug: string): Observable<Article> {
     return this.apiService.get<Article>(API_ENDPOINTS.ARTICLES.DETAIL(slug));
